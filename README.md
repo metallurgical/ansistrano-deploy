@@ -108,6 +108,8 @@ After that, create playbook file with the name `deploy.yml`, put following code:
    |- shared
    ```
    
+   For automated process, this setup can be setup directly into target machine. To make it possbile, setup CI/CD(continoues integration & continoues delivery) inside gitlab, create a task and make gitlab task run/execute ansible command for every push from local into remote repositories or every merge from feature branch into master branch.
+   
    This is just a basic configuration. For more details proceed to https://github.com/ansistrano/deploy and http://docs.ansible.com/ documentation. Done!
 
 
