@@ -16,7 +16,7 @@ Deploy scripting language has never been easy, but with the help of Ansistrano, 
 Before proceed to step by step, its better if we know how the end result of deployment should end. After the deployment process's done, we should have a few folder exist/created in our **target(where to deploy to)** as below.
 
  - **current**(symlink to release folder)
-   - The symlink folder that point out to latest release's timestamp that exist in *release* folder. So at this point, if we're using apache, we need to setup up *document root* point to *current* folder instead of *current*.
+   - The symlink folder that point out to latest release's timestamp that exist in *release* folder. So at this point, if we're using apache, we need to setup up *document root* point to *current* folder instead of *release*.
  - **release**
    - Having release(timestamp) folder that contain our application's code. This folder will have a few folders depend on how many release we want to keep before the clean up process occured. So this folder actually stored our application's code either **fetching** from git repository or **copying** from local development to staging/production server using **rsync** command which is depend on our ansible's configuration.
  - **shared**
@@ -90,19 +90,25 @@ After that, create playbook file with the name `deploy.yml`, put following code:
    $ ansible-playboook -i /opt/lampp/htdocs/<my-project>/ansible/hosts /opt/lampp/htdocs/<my-project>/ansible/deploy.yml
    ```
    
-   If everything's good, the ansible will do it job like `creating current, release and shared folder`, `pulling data inside git repositories`, `create symlink`, `clean up older release` or else... And inside our remote/staging/productio/targer server now should contains this tree structure:
+   If everything's good, the ansible will do it job like `creating current, release and shared folder`, `pulling data from git repositories`, `create symlink`, `clean up older release` or else... And inside our remote/staging/production/target server now should contains this tree structure:
    
    ```
    - /var/www/<my-project>
    |- current -> ./release/20171009102230Z <-- symlink to latest release
    |- release -> 
-     |- 20171009102230Z <-- this is the latest release
-     |- 20171009092230Z <-- this is the older release
+     |- 20171009102230Z <-- this is the latest release(contain our code)
+      |- index.php
+      |- composer.json
+      |- ... any files
+     |- 20171009092230Z <-- this is the older releasecontain our code)
+      |- index.php
+      |- composer.json
+      |- ... any files
     
    |- shared
    ```
    
-   Done!
+   This is just a basic configuration. For more details proceed to https://github.com/ansistrano/deploy and http://docs.ansible.com/ documentation. Done!
 
 
   
