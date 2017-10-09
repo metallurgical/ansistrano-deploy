@@ -100,7 +100,7 @@ After that, create playbook file with the name `deploy.yml`, put following code:
       |- index.php
       |- composer.json
       |- ... any files
-     |- 20171009092230Z <-- this is the older releasecontain our code)
+     |- 20171009092230Z <-- this is the older release(contain our code)
       |- index.php
       |- composer.json
       |- ... any files
