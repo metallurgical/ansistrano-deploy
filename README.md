@@ -50,3 +50,60 @@ Assume you have local development reside in this `/opt/lampp/htdocs/<my-project>
  |- index.php <-- contain php code
  |- composer.json <-- contain project dependencies(soon we'll create task for executing composer install after one of ansible life cycle's done)
 ```
+
+Inside `ansible` directory, create `hosts` file if not exist, otherwise edit it. Host file is the file that contains our remote/production/staging's ip address or domain. Later we'll reference this file inside our `playbook`. Here is example of hosts file looks like :
+
+```
+[staging_server] <-- this is group name, we can put more than one server
+172.x.x.x
+
+[production_server] <-- this is group name, we can put more than one server
+172.x.x.x
+```
+
+After that, create playbook file with the name `deploy.yml`, put following code:
+
+```
+---
+- name: Deploy php application to staging server
+  hosts: staging_server <-- name of the group inside hosts file or just put `all` if want to deploy all of the servers
+  remote_user: <sudo user in target server> <-- this user should able to use git command(fetch code inside remote repositories)
+  
+  vars:
+    ansistrano_deploy_to: "/var/www/<my-project>" <-- this is our root directory in target server
+    ansistrano_version_dir: "release" <-- this folder's name will be created when deployment process is finish
+    ansistrano_current_dir: "current" <-- this folder's name will be created when deployment process is finish
+    ansistrano_current_via: "symlink" <-- current folder will symlink to release folder(latest release's timestamp)
+    ansistrano_keep_release: 2 <-- how many times should we keep release versioning before ansible clean up older release
+    ansistrano_deploy_via: "git" <-- method to deploy, we use git
+    ansistrano_git_repo: git@gitlab.com:<username>/<my-project>.git <-- git endpoint(using ssh, not http based)
+    ansistrano_git_branch: master <-- default branch to pull
+    ansistrano_git_identity_key_remote_path: "/home/metallurgical/.ssh/id_rsa" <-- tell ansible to use this private key for fetching from repositories(this key must be add into our remote repositories)
+
+  roles:
+   - carlosbuenosvinos.ansistrano-deploy <-- ansible role
+   ```
+   
+   If everything's done configured, run following command:
+   
+   ```
+   $ ansible-playboook -i /opt/lampp/htdocs/<my-project>/ansible/hosts /opt/lampp/htdocs/<my-project>/ansible/deploy.yml
+   ```
+   
+   If everything's good, the ansible will do it job like `creating current, release and shared folder`, `pulling data inside git repositories`, `create symlink`, `clean up older release` or else... And inside our remote/staging/productio/targer server now should contains this tree structure:
+   
+   ```
+   - /var/www/<my-project>
+   |- current -> ./release/20171009102230Z <-- symlink to latest release
+   |- release -> 
+     |- 20171009102230Z <-- this is the latest release
+     |- 20171009092230Z <-- this is the older release
+    
+   |- shared
+   ```
+   
+   Done!
+
+
+  
+
