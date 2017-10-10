@@ -3,11 +3,13 @@ Deployment guidance using ansible + capistrano
 
 ## Requirement(Tested)
 - Linux OS(Linux Mint) - Local
+- MAC OSX(Sierra) - Local
 - Ubuntu 16 LTS - Linode Server
 - Ansible
 - Ansistrano v2.2.0
 - Git
 - SSH
+- Gitlab.com
 
 ## Introduction
 Deploy scripting language has never been easy, but with the help of Ansistrano, we can deploy so much language(PHP, Ruby, Python, etc) into our staging/production server with just a few configuration that need to setup. Lucky to us, we can use both **ansistrano.deploy** and **ansistrano.rollback** for deployment and rollback respectively.
