@@ -63,7 +63,7 @@ Inside `ansible` directory, create `hosts` file if not exist, otherwise edit it.
 
 After that, create playbook file with the name `deploy.yml`, put following code:
 
-```
+```yaml
 ---
 - name: Deploy php application to staging server
   hosts: staging_server <-- name of the group inside hosts file or just put `all` if want to deploy all of the servers
@@ -107,6 +107,47 @@ After that, create playbook file with the name `deploy.yml`, put following code:
     
    |- shared
    ```
+   
+ ## Life Cycle's HOOK
+ Every creating of directories such as `current`, `release` and `shared`, ansistrano make it possible to hook our custom task by using following variables :
+ 
+ ```yaml
+ # Hooks: custom tasks if you need them
+  ansistrano_before_setup_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-setup-tasks.yml"
+  ansistrano_after_setup_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-setup-tasks.yml"
+  ansistrano_before_update_code_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-update-code-tasks.yml"
+  ansistrano_after_update_code_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-update-code-tasks.yml"
+  ansistrano_before_symlink_shared_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-symlink-shared-tasks.yml"
+  ansistrano_after_symlink_shared_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-symlink-shared-tasks.yml"
+  ansistrano_before_symlink_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-symlink-tasks.yml"
+  ansistrano_after_symlink_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-symlink-tasks.yml"
+  ansistrano_before_cleanup_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-cleanup-tasks.yml"
+  ansistrano_after_cleanup_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-cleanup-tasks.yml"
+  ```
+  
+  As example, we might need to run custom command for our project dependecies like `composer install`, `npm install`, `bower install` or run `php artisan command` or even run any cli-command, as such we can run those command by creating custom play and register it inside our main playbook like following:
+  
+  To do this, create one file name `/opt/lampp/htdocs/<my-project>/ansible/after-symlink-shared.yml` and put following content.
+  
+  ```yaml
+  - name: Composer Install
+    composer:
+      command: install
+      working_dir: "{{ansistrano_release_path.stdout}}" <-- ansistrano_release_path.stdout is variable provided by ansistrano in case we want to read our releases(latest) folder
+   ```
+   
+And in our `/opt/lampp/htdocs/<my-project>/ansible/deploy.yml`, register the hook file under `vars` hash:
+   
+   ```yaml
+   ....
+     vars:
+       .....
+       .....
+       ansistrano_after_symlink_shared_tasks_file: "{{ playbook_dir }}/after-symlink-shared.yml"
+   ```
+   
+Done!. In every ansible's command executed, this custom task will always run after symlink shared task cycle executed. Means that, it will run `composer install` on every deployment occured.
+     
    
    For automated process, this setup can be setup directly into target machine. To make it possbile, setup CI/CD(continoues integration & continoues delivery) inside gitlab, create a task and make gitlab task run/execute ansible command for every push from local into remote repositories or every merge from feature branch into master branch.
    
