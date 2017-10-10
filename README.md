@@ -130,6 +130,7 @@ After that, create playbook file with the name `deploy.yml`, put following code:
   To do this, create one file name `/opt/lampp/htdocs/<my-project>/ansible/after-symlink-shared.yml` and put following content.
   
   ```yaml
+  ---
   - name: Composer Install
     composer:
       command: install
@@ -139,6 +140,7 @@ After that, create playbook file with the name `deploy.yml`, put following code:
 And in our `/opt/lampp/htdocs/<my-project>/ansible/deploy.yml`, register the hook file under `vars` hash:
    
    ```yaml
+   ---
    ....
      vars:
        .....
