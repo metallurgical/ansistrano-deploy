@@ -1,5 +1,5 @@
 ## Ansistrano-deploy
-Deployment guidance using ansible + capistrano
+Deployment guidance using ansible like capistrano style - ansistrano
 
 ## Requirement(Tested)
 - Linux OS(Linux Mint) - Local
